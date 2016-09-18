@@ -64,7 +64,7 @@ public class SeriesNumeros extends javax.swing.JFrame {
             }
         });
 
-        funcion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "e^x", "Item 2", "Item 3", "Item 4" }));
+        funcion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1)e^x", "2) e^-x", "3) e^-x(2)", "4) (1-x)^-1", "5) PI", "6)PI/4", "7)ln(1+x)", "8)", "9)", "10)", "11)", "12)", "13)" }));
 
         tabla.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -139,7 +139,14 @@ public class SeriesNumeros extends javax.swing.JFrame {
          }
          switch(funcion.getSelectedIndex()){
              case 0: va=ex(Float.parseFloat(txtX.getText()),Integer.parseInt(txtIter.getText())); break;
+             case 1: va=enegx(Float.parseFloat(txtX.getText()),Integer.parseInt(txtIter.getText())); break;
+             case 2: va=enegx2(Float.parseFloat(txtX.getText()),Integer.parseInt(txtIter.getText())); break;
+             case 3: va=unomenosx(Float.parseFloat(txtX.getText()),Integer.parseInt(txtIter.getText())); break;
+             case 4: va=pi(Integer.parseInt(txtIter.getText())); break;
+             case 5: va=pisobre4(Integer.parseInt(txtIter.getText())); break;
+             case 6: va=logNat1masx(Float.parseFloat(txtX.getText()),Integer.parseInt(txtIter.getText())); break;
          }
+         if(va==null)return;
          ea=errorAprox(va);
          for(int i=0;i<datos.length;i++){
              datos[i]=new RowFormat(i,va[i],ea[i]);
@@ -165,11 +172,111 @@ public class SeriesNumeros extends javax.swing.JFrame {
         }
         return res;
     }
+    private double[] enegx(float x, int it){
+        double res[]=new double[it];
+        double res2[]=new double[it];
+        for(int i=0;i<it;i++){
+            if(i==0){
+                res[i]=1;
+            }else{
+            res[i]=res[i-1]+((Math.pow(x, i))/factorial(i));
+            }
+        }
+        for(int i=0;i<it;i++){
+            res2[i]=1/res[i];
+        }
+        return res2;
+    }
+    private double[] enegx2(float x, int it){
+        double res[]=new double[it];
+        for(int i=0;i<it;i++){
+            if(i==0){
+                res[i]=1;
+            }else{
+                if(i%2!=0){
+                    res[i]=res[i-1]-((Math.pow(x, i))/factorial(i));
+                }else{
+                    res[i]=res[i-1]+((Math.pow(x, i))/factorial(i));
+                }            
+            }
+        }
+        return res;
+    }
+    private double[] unomenosx(double x, int it){
+        double[] res=new double[it];
+        for(int i=0;i<it;i++){
+            if(i==0){
+                res[i]=1;
+            }else{
+                res[i]=res[i-1]+Math.pow(x,i);
+            }
+        }
+        return res;
+    }
+    private double[] pi(int it){
+        if(it%2!=0){
+            javax.swing.JOptionPane.showMessageDialog(this,"Solo se aceptan iteraciones pares");
+            return null;
+        }else{
+            double[] res=new double[it];
+            int impar=3;
+            for(int i=0;i<it;i++){
+                if(i==0){
+                    res[i]=4;
+                }else{
+                    if(i%2!=0){
+                        res[i]=res[i-1]-(4f/impar);
+                    }else{
+                        res[i]=res[i-1]+(4f/impar);
+                    }   
+                    impar+=2;
+                }
+            }
+            return res;
+        }
+    }
+    private double[] pisobre4(int it){
+        if(it%2!=0){
+            javax.swing.JOptionPane.showMessageDialog(this,"Solo se aceptan iteraciones pares");
+            return null;
+        }else{
+            double[] res=new double[it];
+            int impar=3;
+            for(int i=0;i<it;i++){
+                if(i==0){
+                    res[i]=1;
+                }else{
+                    if(i%2!=0){
+                        res[i]=res[i-1]-(1f/impar);
+                    }else{
+                        res[i]=res[i-1]+(1f/impar);
+                    }   
+                    impar+=2;
+                }
+            }
+            return res;
+        }
+    }
+    private double[] logNat1masx(double x,int it){
+        double[] res=new double[it];
+        for(int i=0;i<it;i++){
+            if(i==0){
+                res[i]=x;
+            }else{
+                if(i%2!=0){
+                    res[i]=res[i-1]-(Math.pow(x,i+1)/(i+1));
+                }else{
+                    res[i]=res[i-1]+(Math.pow(x,i+1)/(i+1));
+                }
+            }
+        }
+        return res;
+    }
     private int factorial (int numero) {
-  if (numero==0)
-    return 1;
-  else
-    return numero * factorial(numero-1);
+        if (numero==0)
+            return 1;
+        else
+            return numero * factorial(numero-1);
     }
     private String[] errorAprox(double[] data){
         String[] error=new String[data.length];
@@ -177,7 +284,7 @@ public class SeriesNumeros extends javax.swing.JFrame {
             if(i==0){
                 error[i]="--";
             }else{
-                error[i]=((Math.abs(data[i]-data[i-1]))/(data[i]))*100+"";
+                error[i]=((Math.abs(data[i]-data[i-1]))/(Math.abs(data[i])))*100+"";
             }
         }
         return error;
